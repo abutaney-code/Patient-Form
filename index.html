@@ -3,235 +3,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Tracker</title>
+  <title>Patient Tracker Pro</title>
   <style>
-    /* Styling for the page layout */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       height: 100vh;
       margin: 0;
-      background-color: #f9f9f9;
+      background-color: #f4f7f6;
     }
 
-    /* Sidebar styling */
+    /* Sidebar */
     #sidebar {
-      width: 300px;
+      width: 320px;
       background: #ffffff;
       padding: 20px;
-      border-right: 2px solid #e0e0e0;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      border-right: 1px solid #ddd;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Main content styling */
+    /* Main Content */
     #main-content {
       flex-grow: 1;
       padding: 40px;
-      background-color: #f9f9f9;
+      overflow-y: auto;
     }
 
-    h2, h3 { color: #333; }
-
-    /* Form and button styling */
-    .form-group { margin-bottom: 15px; }
-    
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover { background-color: #0056b3; }
-
-    /* Patient list styling */
-    #patient-list { margin-top: 20px; }
-    
-    .patient-item {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .patient-item:hover { background-color: #f1f1f1; }
-
-    /* Utility classes */
-    .hidden { display: none; }
-    
     .card {
       background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      max-width: 500px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 600px;
     }
 
-    /* Medication list styling */
-    #medication-list {
-      background: #fdfdfd;
-      border: 1px solid #eee;
-      padding: 15px 15px 15px 35px;
-      border-radius: 4px;
+    /* Inputs & Buttons */
+    .form-group { margin-bottom: 12px; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
     }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover { background-color: #34495e; }
+
+    .btn-add-med { background-color: #27ae60; margin-top: 10px; }
+    .btn-add-med:hover { background-color: #219150; }
+
+    .btn-delete {
+      background-color: #e74c3c;
+      padding: 5px 10px;
+      width: auto;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
+
+    /* Lists */
+    .patient-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .patient-item:hover { background-color: #f9f9f9; }
+    
+    #medication-list {
+      list-style: none;
+      padding: 0;
+    }
+    #medication-list li {
+      background: #f8f9fa;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .hidden { display: none; }
+    .label { font-weight: bold; color: #7f8c8d; display: block; margin-top: 10px; }
+    .data-val { color: #2c3e50; font-size: 1.1em; }
   </style>
 </head>
 <body>
 
   <div id="sidebar">
-    <h3>Add New Patient</h3>
+    <h3>New Patient</h3>
+    <div class="form-group"><input type="text" id="new-name" placeholder="Full Name"></div>
+    <div class="form-group"><input type="text" id="new-weight" placeholder="Weight (lbs/kg)"></div>
     <div class="form-group">
-      <input type="text" id="new-name" placeholder="Patient Name (e.g., John Doe)">
+      <select id="new-gender">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
     </div>
-    <div class="form-group">
-      <input type="text" id="new-weight" placeholder="Weight (e.g., 180 lbs)">
-    </div>
-    <button onclick="addPatient()">Add Patient</button>
+    <div class="form-group"><input type="text" id="new-doctor" placeholder="Assigned Doctor"></div>
+    <button onclick="addPatient()">Add to System</button>
 
-    <hr style="margin: 25px 0; border: 1px solid #eee;">
-
-    <h3>Patient Roster</h3>
-    <div id="patient-list">
-      </div>
+    <hr style="width:100%; margin: 20px 0;">
+    <h3>All Patients</h3>
+    <div id="patient-list"></div>
   </div>
 
   <div id="main-content">
-    
-    <div id="empty-state">
-      <h2>Select a patient from the left to view their details.</h2>
-    </div>
+    <div id="empty-state"><h2>Select a patient to view details</h2></div>
 
     <div id="patient-details" class="card hidden">
-      <h2 id="display-name">Patient Name</h2>
-      <p style="font-size: 1.2em;"><strong>Weight:</strong> <span id="display-weight"></span></p>
+      <h2 id="display-name" style="margin-top:0; color:#2980b9;">Patient Name</h2>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <span class="label">Weight</span>
+          <span id="display-weight" class="data-val"></span>
+        </div>
+        <div>
+          <span class="label">Gender</span>
+          <span id="display-gender" class="data-val"></span>
+        </div>
+        <div style="grid-column: span 2;">
+          <span class="label">Primary Physician</span>
+          <span id="display-doctor" class="data-val"></span>
+        </div>
+      </div>
 
-      <hr style="border: 1px solid #eee; margin: 20px 0;">
+      <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
       <h3>Medications</h3>
-      <ul id="medication-list">
-        </ul>
+      <ul id="medication-list"></ul>
 
-      <div class="form-group" style="margin-top: 20px;">
-        <input type="text" id="new-medication" placeholder="Type a medication name...">
+      <div class="form-group">
+        <input type="text" id="new-medication" placeholder="Enter medication name...">
+        <button class="btn-add-med" onclick="addMedication()">Add Medication</button>
       </div>
-      <button onclick="addMedication()">Add Medication</button>
+      
+      <button class="btn-delete" style="width:100%; margin-top:30px;" onclick="deletePatient()">Delete Patient Profile</button>
     </div>
-
   </div>
 
   <script>
-    // This array will hold all of our patient data
-    let patients = [];
-    // Keeps track of which patient we are currently looking at
+    let patients = JSON.parse(localStorage.getItem('patientData')) || [];
     let currentPatientId = null;
 
-    // 1. Function to add a new patient
+    renderSidebar();
+
+    function saveData() {
+      localStorage.setItem('patientData', JSON.stringify(patients));
+    }
+
     function addPatient() {
-      const nameInput = document.getElementById('new-name');
-      const weightInput = document.getElementById('new-weight');
-      
-      const name = nameInput.value.trim();
-      const weight = weightInput.value.trim();
+      const name = document.getElementById('new-name').value;
+      const weight = document.getElementById('new-weight').value;
+      const gender = document.getElementById('new-gender').value;
+      const doctor = document.getElementById('new-doctor').value;
 
-      if (name !== '' && weight !== '') {
-        // Create a patient object
+      if (name && weight && gender && doctor) {
         const newPatient = {
-          id: Date.now(), // Creates a unique ID based on the current time
-          name: name,
-          weight: weight,
-          medications: [] // Starts with an empty list of medications
+          id: Date.now(),
+          name,
+          weight,
+          gender,
+          doctor,
+          medications: []
         };
-
-        // Add to our list and clear the input boxes
         patients.push(newPatient);
-        nameInput.value = '';
-        weightInput.value = '';
-
-        // Update the sidebar
+        saveData();
         renderSidebar();
+        
+        // Clear inputs
+        ['new-name', 'new-weight', 'new-gender', 'new-doctor'].forEach(id => document.getElementById(id).value = '');
       } else {
-        alert("Please enter both a name and a weight.");
+        alert("Please fill in all fields");
       }
     }
 
-    // 2. Function to update the sidebar with patient names
     function renderSidebar() {
-      const listContainer = document.getElementById('patient-list');
-      listContainer.innerHTML = ''; // Clear the current list
-
-      patients.forEach(patient => {
+      const list = document.getElementById('patient-list');
+      list.innerHTML = '';
+      patients.forEach(p => {
         const div = document.createElement('div');
         div.className = 'patient-item';
-        div.innerText = patient.name;
-        // When clicked, show this patient's details
-        div.onclick = () => selectPatient(patient.id);
-        listContainer.appendChild(div);
+        div.innerHTML = `<span>${p.name}</span>`;
+        div.onclick = () => selectPatient(p.id);
+        list.appendChild(div);
       });
     }
 
-    // 3. Function to show a specific patient's details
     function selectPatient(id) {
       currentPatientId = id;
+      const p = patients.find(p => p.id === id);
       
-      // Find the specific patient in our array
-      const patient = patients.find(p => p.id === id);
-
-      // Hide the empty state and show the details card
       document.getElementById('empty-state').classList.add('hidden');
       document.getElementById('patient-details').classList.remove('hidden');
 
-      // Populate the name and weight
-      document.getElementById('display-name').innerText = patient.name;
-      document.getElementById('display-weight').innerText = patient.weight;
+      document.getElementById('display-name').innerText = p.name;
+      document.getElementById('display-weight').innerText = p.weight;
+      document.getElementById('display-gender').innerText = p.gender;
+      document.getElementById('display-doctor').innerText = p.doctor;
 
-      // Update the medication list
       renderMedications();
     }
 
-    // 4. Function to add a medication to the currently selected patient
     function addMedication() {
-      if (!currentPatientId) return;
-
-      const medInput = document.getElementById('new-medication');
-      const medName = medInput.value.trim();
-
-      if (medName !== '') {
-        const patient = patients.find(p => p.id === currentPatientId);
-        patient.medications.push(medName); // Add the medication
-        medInput.value = ''; // Clear the box
-        
-        renderMedications(); // Update the screen
+      const input = document.getElementById('new-medication');
+      const med = input.value.trim();
+      if (med && currentPatientId) {
+        const p = patients.find(p => p.id === currentPatientId);
+        p.medications.push(med);
+        saveData();
+        input.value = '';
+        renderMedications();
       }
     }
 
-    // 5. Function to update the medication list on the screen
     function renderMedications() {
-      const patient = patients.find(p => p.id === currentPatientId);
-      const medList = document.getElementById('medication-list');
-      
-      medList.innerHTML = ''; // Clear current medications
+      const p = patients.find(p => p.id === currentPatientId);
+      const list = document.getElementById('medication-list');
+      list.innerHTML = '';
+      p.medications.forEach((m, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${m}</span> <button class="btn-delete" onclick="deleteMed(${index})">X</button>`;
+        list.appendChild(li);
+      });
+    }
 
-      if (patient.medications.length === 0) {
-        medList.innerHTML = '<li>No medications added yet.</li>';
-      } else {
-        patient.medications.forEach(med => {
-          const li = document.createElement('li');
-          li.innerText = med;
-          medList.appendChild(li);
-        });
+    function deleteMed(index) {
+      const p = patients.find(p => p.id === currentPatientId);
+      p.medications.splice(index, 1);
+      saveData();
+      renderMedications();
+    }
+
+    function deletePatient() {
+      if(confirm("Are you sure you want to delete this patient?")) {
+        patients = patients.filter(p => p.id !== currentPatientId);
+        saveData();
+        currentPatientId = null;
+        document.getElementById('patient-details').classList.add('hidden');
+        document.getElementById('empty-state').classList.remove('hidden');
+        renderSidebar();
       }
     }
   </script>
